@@ -5,23 +5,30 @@ services:
     # Ces services comprennent un serveur todo, un client, et un superviseur qui observe les tâches
     c1:
       # Client - Ajoute et retire des tâches automatiquement
-      container_name: arret02-c1
       image: arret02-client
+      container_name: arret02-c1
+      build: './client'
       tty: true
+      volumes:
+      - "./fortune:/fortune"
       
     s1:
       # Serveur - Traite les demandes todo
-      container_name: arret02-s1
       image: arret02-serveur
+      container_name: arret02-s1
+      build: './serveur'
       tty: true
       volumes:
-        - "./tmp_todo1:/todo"
+        - "./fortune:/fortune"
 
     gestionnaire:
       # Permet d'observer les tâches en cours
-      container_name: arret02-gestionnaire
       image: arret02-gestionnaire
+      container_name: arret02-gestionnaire
+      build: './gestionnaire'
       tty: true
+      volumes:
+      - "./fortune:/fortune"
       environment:
         - MONSERVEUR='s1'
         - MONNOM='c1'
@@ -29,3 +36,4 @@ services:
 # Réseau par défaut
 networks:
   arret02-todo-net:
+    driver: bridge
