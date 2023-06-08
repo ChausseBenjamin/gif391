@@ -5,31 +5,69 @@ services:
     # Ces services comprennent trois serveurs todo, trois clients, et un superviseur qui observe les tâches
     c1:
       # Premier client - Ajoute et retire des tâches automatiquement
+      build:
+        context: ./
+        dockerfile: ./Dockerfile.client
       container_name: arret03-c1
       image: arret03-client
       tty: true
+      environment:
+        - MONSERVEUR='s1'
+        - MONNOM='c1'
 
     c2:
+      container_name: arret03-c2
+      image: arret03-client
       tty: true
+      environment:
+        - MONSERVEUR='s2'
+        - MONNOM='c2'
 
     c3:
+      container_name: arret03-c3
+      image: arret03-client
       tty: true
+      environment:
+        - MONSERVEUR='s3'
+        - MONNOM='c3'
       
     s1:
       # Premier serveur - Traite les demandes todo
+      build:
+        context: ./
+        dockerfile: ./Dockerfile.serveur
       container_name: arret03-s1
       image: arret03-serveur
       tty: true
       volumes:
-        - "./tmp_todo1:/todo"
+        - ./fortune:/fortune
+      environment:
+        - MONSERVEUR='s1'
+        - MONNOM='c1'
 
     s2:
+      container_name: arret02-s2
+      image: arret02-serveur
       tty: true
-
+      volumes:
+        - ./fortune:/fortune
+      environment:
+        - MONSERVEUR='s2'
+        - MONNOM='c2'
     s3:
+      container_name: arret02-s3
+      image: arret02-serveur
       tty: true
+      volumes:
+        - ./fortune:/fortune
+      environment:
+        - MONSERVEUR='s3'
+        - MONNOM='c3'
 
     gestionnaire:
+      build:
+        context: ./
+        dockerfile: ./Dockerfile.gestionnaire
       container_name: arret03-gestionnaire
       image: arret03-gestionnaire
       tty: true

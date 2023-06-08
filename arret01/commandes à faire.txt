@@ -1,0 +1,7 @@
+./build-arret01.sh
+docker run -it arret01 sh
+
+dans la machine :
+se déplacer /usr/local/bin#
+tester les commande nouveau, retrait, liste, aide
+le fichier todo est dans /todo/todo.txt

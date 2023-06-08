@@ -1,0 +1,5 @@
+docker build -f Dockerfile.serveur -t arret02-serveur ./
+docker build -f Dockerfile.gestionnaire -t arret02-gestionnaire ./
+docker build -f Dockerfile.client -t arret02-client ./
+docker exec -it d052214786d1 sh
+call -r #les parametres ne fonctionne pas tres bien

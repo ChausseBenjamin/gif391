@@ -1,39 +1,47 @@
 version: '3.2'
 
-# Définition des services docker
+# Definition des services docker
 services:
-    # Ces services comprennent un serveur todo, un client, et un superviseur qui observe les tâches
+    # Ces services comprennent un serveur todo, un client, et un superviseur qui observe les taches
     c1:
-      # Client - Ajoute et retire des tâches automatiquement
-      image: arret02-client
-      container_name: arret02-c1
-      build: './client'
-      tty: true
-      volumes:
-      - "./fortune:/fortune"
+      # Client - Ajoute et retire des taches automatiquement
       
-    s1:
-      # Serveur - Traite les demandes todo
-      image: arret02-serveur
-      container_name: arret02-s1
-      build: './serveur'
+      build:
+        context: ./
+        dockerfile: ./Dockerfile.client
+      container_name: arret02-c1
+      image: arret02-client
       tty: true
-      volumes:
-        - "./fortune:/fortune"
-
-    gestionnaire:
-      # Permet d'observer les tâches en cours
-      image: arret02-gestionnaire
-      container_name: arret02-gestionnaire
-      build: './gestionnaire'
-      tty: true
-      volumes:
-      - "./fortune:/fortune"
       environment:
         - MONSERVEUR='s1'
         - MONNOM='c1'
 
-# Réseau par défaut
+    s1:
+      # Serveur - Traite les demandes todo
+      build:
+        context: ./
+        dockerfile: ./Dockerfile.serveur
+      container_name: arret02-s1
+      image: arret02-serveur
+      tty: true
+      volumes:
+        - ./fortune:/fortune
+      environment:
+        - MONSERVEUR='s1'
+        - MONNOM='c1'
+
+    gestionnaire:
+      # Permet d'observer les taches en cours
+      build:
+        context: ./
+        dockerfile: ./Dockerfile.gestionnaire
+      container_name: arret02-gestionnaire
+      image: arret02-gestionnaire
+      tty: true
+      environment:
+        - MONSERVEUR='s1'
+        - MONNOM='c1'
+
+# Reseau par defaut
 networks:
   arret02-todo-net:
-    driver: bridge
