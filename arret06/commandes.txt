@@ -1,0 +1,5 @@
+docker build -t todo-base -f ../base_img/Dockerfile ../base_img/
+
+./load_img_k8.sh
+
+

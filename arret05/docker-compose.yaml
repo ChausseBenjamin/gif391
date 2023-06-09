@@ -11,10 +11,14 @@ services:
     depends_on:
       - s1
     environment:
-      - MONSERVEUR='s1'
-      - MONNOM='c1'
+      - MONSERVEUR=s1
+      - MONNOM=c1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
     tty: true
-
+    networks:
+      arret05-todo-net:
   # Deuxième client - Ajoute et retire des tâches automatiquement
   c2:
     container_name: arret05-c2
@@ -22,10 +26,14 @@ services:
     depends_on:
       - s1
     environment:
-      - MONSERVEUR='s1'
-      - MONNOM='c2'
+      - MONSERVEUR=s1
+      - MONNOM=c2
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
     tty: true
-
+    networks:
+      arret05-todo-net:
   # Troisième client - Ajoute et retire des tâches automatiquement
   c3:
     container_name: arret05-c3
@@ -33,10 +41,14 @@ services:
     depends_on:
       - s1
     environment:
-      - MONSERVEUR='s1'
-      - MONNOM='c3'
+      - MONSERVEUR=s1
+      - MONNOM=c3
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
     tty: true
-
+    networks:
+      arret05-todo-net:
   s1:
     # Serveur unique - Traite les demandes todo
     build:
@@ -47,6 +59,14 @@ services:
     tty: true
     depends_on:
       - db
+    environment:
+      - MONSERVEUR=bd
+      - MONNOM=s1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
+    networks:
+      arret05-todo-net:
   # Permet d'observer les tâches en cours
   gestionnaire:
     build: 
@@ -57,29 +77,30 @@ services:
     tty: true
     environment:
       MONSERVEUR: s1
-      MONNOM: c1,c2,c3
-
+      MONNOM: gestionnaire
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
     depends_on:
       - s1
+    networks:
+      arret05-todo-net:
 
   # Permet d'enregistrer les tâches
   db:
     container_name: arret05-db
     image: postgres:15
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DATABASE: 'postgres'
-    #ports:
-    #  - 5435:5432
-    #environment:
-    #  - POSTGRES_PASSWORD=postgres
-    #  - POSTGRES_USER=postgres
-    #  - POSTGRES_DB=postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_ROLE: postgres
     volumes:
-      - "todo-db:/var/lib/postgresql/data"
-      - "./init_db/sql:/docker-entrypoint-initdb.d/init.sql"
-
+      - "./init_db/sql:/docker-entrypoint-initdb.d"
+    ports:
+      - 5456:5432
+    networks:
+      arret05-todo-net:
 volumes:
   todo-db:
 
