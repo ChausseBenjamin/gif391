@@ -1,0 +1,6 @@
+while true; do
+  liste | wc -l > tmp.txt;
+  clear;
+  cat tmp.txt;
+  sleep 1;
+done
