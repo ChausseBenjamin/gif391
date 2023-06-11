@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{codeblocks}
-\usepackage{xcolor}
+%\usepackage{xcolor}
 
 % \addbibresource{bibliography.bib}
 % \nofiles
@@ -41,15 +41,23 @@
 
 \section{Discussion de la structure}
 
-\todo{Quelle est la structure du système distribué de façon générique?} \\
+La version finale du système offre une plus grande flexibilité par rapport aux premières itérations. Son principal inconvénient réside dans sa complexité croissante, ce qui peut entraîner des problèmes à différents niveaux, parfois difficiles à détecter. Cependant, les avantages sont nombreux. La nature distribuée du système facilite son expansion horizontale, le rendant ainsi adapté à un grand nombre d'utilisateurs. L'utilisation d'une base de données garantit l'atomicité des transactions pour éviter les conflits et les enregistrements en double. La réplication des serveurs et des bases de données augmente la redondance et, par conséquent, la résilience du système. La modularité des composants permet des mises à niveau fluides et transparentes pour l'utilisateur.
 
 \subsection{Technologies sous-jacentes}
 
 \subsubsection{Identification des ressources}
 
+La technologie utilisée pour identifier les ressources s'appelle "namespace". Elle nous a permis d'attribuer différentes ressources. Au début, nous l'avons principalement utilisée pour assigner des emplacements de stockage afin de partager des fichiers entre les différents conteneurs. Par la suite, lorsque des requêtes réseau via SSH ont été introduites, nous avons utilisé les namespaces pour créer un réseau virtuel sur lequel les machines pouvaient communiquer facilement. Les noms des conteneurs étaient utilisés pour remplacer les adresses IP, ce qui simplifiait grandement nos interactions. En résumé, les namespaces sont utiles pour assigner diverses ressources telles que le réseau, les systèmes de fichiers, les processus, les groupes ou les utilisateurs, et bien d'autres encore.
+
 \subsubsection{Contrôle d'accès aux ressources}
 
+Pour contrôler l'accès aux ressources, nous avons utilisé les cgroups. Ces derniers permettent d'attribuer l'allocation de différentes ressources (processeur, mémoire, disque) en fonction des membres du cgroup. Ces membres peuvent être un processus spécifique, un utilisateur ou un conteneur dans son intégralité. Nous pouvons gérer la quantité minimale de ressources et donner la priorité à certaines entités par rapport à d'autres. Les cgroups sont également un bon moyen de gérer les accès à des répertoires et à des réseaux spécifiques.
+
 \subsubsection{Gestion des accès aux fichiers utilisés}
+
+
+Docker utilise une technologie Linux très pratique appelée "système de fichiers en couches" (Union File System). Le concept est simple : certains répertoires sont en lecture seule, et lorsqu'une modification est nécessaire, elle est enregistrée dans un répertoire qui stocke uniquement les différences (un peu comme la technologie Git). Cette approche permet à plusieurs conteneurs d'utiliser la même base commune, mais chacun d'entre eux de manière distincte avec son propre répertoire de modifications. Dans la dernière itération, plusieurs clients utilisaient l'image client, mais chacun était unique. Cela nous permet d'utiliser efficacement l'espace de stockage et d'éviter de corrompre l'image initiale.
+
 
 \todo{Quels sont les pilotes utilisables pour la persistance du système de fichiers
 à union ?} \\
