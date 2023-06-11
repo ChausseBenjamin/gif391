@@ -65,6 +65,8 @@ Docker utilise une technologie Linux très pratique appelée "système de fichie
 
 \subsubsection{Configuration réseau pour la communication des conteneurs}
 
+Pour simplifier l'environnement dans lequel nous travaillions, nous avons utilisé un namespace de réseau pour regrouper toutes les entités sur la même couche. Bien que cela fonctionnait, cette architecture n'était pas la plus idéale dans un environnement de production. Certaines entités, comme les clients, ne devraient pas nécessairement avoir accès aux autres, telles que la base de données. En général, ceux-ci sont disposées sur des réseaux distants et les interactions requises sont déterminées à l'avance. Afin d'assurer l'encapsulation des composants et la sécurité du système, l'authentification et le chiffrement sont des étapes obligatoires avant toute action. Étant donné que l'objectif de l'activité ne portait pas spécifiquement sur la mise en réseau, tous les services étaient visibles et accessibles à tous.
+
 \subsubsection{Duplication mise en place pour les ressources}
 
 \todo{Quelles ressources doivent être dupliquées, et pourquoi?} \\
