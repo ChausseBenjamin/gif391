@@ -4,32 +4,64 @@
 \usepackage{titlepage}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
+\usepackage{codeblocks}
+\usepackage{xcolor}
 
 % \addbibresource{bibliography.bib}
-\nofiles
+% \nofiles
+
+\newcommand{\todo}[1]{\textcolor{orange}{\textbf{TODO}: #1}}
+\newcommand{\note}[1]{\textcolor{purple}{\textbf{NOTE}: #1}}
+\newcommand{\xxx}[1]{\textcolor{red}{\textbf{XXX}: #1}}
 
 % \institution{Université de Sherbrooke}
 % \faculty{Faculté de génie}
 % \department{Département de génie électrique et de génie informatique}
-\title{Titre du document}
-\classnb{GEN420}
-\class{Mathématiques des circuits logiques}
+\title{Rapport d'APP}
+\classnb{GIF391}
+\class{Conception d'un système distribué}
 \author{
   \addtolength{\tabcolsep}{-0.4em}
   \begin{tabular}{rcl} % Ajouter des auteurs au besoin
-  Prénom Nom     & -- & CIP \\
+  Benjamin Chausse & -- & CHAB1704 \\
+  Samuel Bilodeau  & -- & BILS2704 \\
   \end{tabular}
 }
-% \teacher{Benjamin Chausse}
+\teacher{Frédéric Mailhot}
 % \location{Sherbrooke}
 % \date{\today}
 
 \begin{document}
 \maketitle
 \newpage
-% \tableofcontents
-% \newpage
+\tableofcontents
+\newpage
 
+\section{Description des solutions utilisées}
+
+\section{Discussion de la structure}
+
+\todo{Quelle est la structure du système distribué de façon générique?} \\
+
+\subsection{Technologies sous-jacentes}
+
+\subsubsection{Identification des ressources}
+
+\subsubsection{Contrôle d'accès aux ressources}
+
+\subsubsection{Gestion des accès aux fichiers utilisés}
+
+\todo{Quels sont les pilotes utilisables pour la persistance du système de fichiers
+à union ?} \\
+\todo{Quel pilote de persistence a été utilisé et pourquoi ?}
+
+\subsubsection{Configuration réseau pour la communication des conteneurs}
+
+\subsubsection{Duplication mise en place pour les ressources}
+
+\todo{Quelles ressources doivent être dupliquées, et pourquoi?} \\
+\todo{Dans quel cas la duplication peut se faire sur une machine réelle unique, dans
+quel cas elle doit être distribuée sur plusieurs machines réelles ?}
 
 
 % \newpage
