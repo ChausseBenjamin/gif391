@@ -63,6 +63,10 @@ Docker utilise une technologie Linux très pratique appelée "système de fichie
 à union ?} \\
 \todo{Quel pilote de persistence a été utilisé et pourquoi ?}
 
+Plusieurs pilotes sont disponibles pour gérer les fichiers à union, tels que UFS (Advanced Multi-Layered Unification File System), DeviceMapper, Btrfs (B-Tree File System), mais celui qui nous intéresse est OverlayFS, plus spécifiquement sa deuxième version, Overlay2. Depuis la version 1.13 de Docker, Overlay2 est le pilote par défaut utilisé.
+
+Overlay2 est une version améliorée d'OverlayFS qui nous permet de gérer efficacement les modifications tout en maintenant la transparence des fichiers uniques pour l'utilisateur. Il garantit également l'intégrité des fichiers sous-jacents et réduit l'utilisation de l'espace mémoire nécessaire. Avec Overlay2, les modifications apportées aux fichiers dans les conteneurs sont enregistrées de manière efficace en créant des couches supplémentaires, tout en préservant l'état d'origine de l'image de base. Cela permet une utilisation efficace des ressources et facilite la création de conteneurs basés sur des images existantes.
+
 \subsubsection{Configuration réseau pour la communication des conteneurs}
 
 Pour simplifier l'environnement dans lequel nous travaillions, nous avons utilisé un namespace de réseau pour regrouper toutes les entités sur la même couche. Bien que cela fonctionnait, cette architecture n'était pas la plus idéale dans un environnement de production. Certaines entités, comme les clients, ne devraient pas nécessairement avoir accès aux autres, telles que la base de données. En général, ceux-ci sont disposées sur des réseaux distants et les interactions requises sont déterminées à l'avance. Afin d'assurer l'encapsulation des composants et la sécurité du système, l'authentification et le chiffrement sont des étapes obligatoires avant toute action. Étant donné que l'objectif de l'activité ne portait pas spécifiquement sur la mise en réseau, tous les services étaient visibles et accessibles à tous.
