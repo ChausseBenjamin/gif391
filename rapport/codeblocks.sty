@@ -21,6 +21,24 @@
 \definecolor{keyword}{HTML}{718ECD} % #718ECD Keywords          |
 % }}}------------------------------------------------------------
 
+% Bash style definition {{{--------------------------------------
+\lstdefinestyle{bashstyle}{
+  language=bash,
+  basicstyle=\ttfamily\small\color{basic},
+  commentstyle=\color{comment},
+  keywordstyle=\color{keyword},
+  stringstyle=\color{string},
+  numbers=left,
+  numbersep=5pt, % How far are line numbers from code              |
+  numberstyle=\tiny\color{linenb},
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  moredelim=[s][\color{item}]{[}{]},
+  literate=
+    *{;}{{\textcolor{param}{;}}}1
+}
+
 % YAML language definition {{{--------------------------------------
 \lstdefinelanguage{YAML}{ %                                        |
   numbers=left, % Line numbers on the left                         |

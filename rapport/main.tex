@@ -39,6 +39,51 @@
 
 \section{Description des solutions utilisées}
 
+\subsection{Arrêt 1: Exemple d'utilisation des commandes}
+
+À ce stade, l'infrastructure emploie un seul conteneur pour son fonctionnement.
+Afin de lancer le système, il faut d'abord construire l'image du conteneur à
+partir de son \textit{Dockerfile}. Par la suite, il faut lancer le conteneur
+afin qu'il puisse s'exécuter en arrière-plan. Enfin, il est possible de s'y
+connecter pour utiliser le système. Voici un exemple d'utilisation de
+l'infrastrucure (le résultat de commandes de mise en place est remplacé par
+"\texttt{...}"):
+
+\begin{code}[title={zsh (dans un terminal)},listing options={language=bash, style=bashstyle}]
+docker build -t arret01 . # Construction de l'image
+docker run -it arret01 # Lancement interactif du conteneur
+\end{code}
+
+\begin{code}[title={sh (dans le conteneur)},listing options={language=bash, style=bashstyle}]
+liste   # Liste des TODOs dans la liste (devrait etre vide)
+nouveau # Ajout d'un TODO utilisant fortune pour la description
+liste   # La liste devrait maintenant contenir un TODO
+retrait # Retrait du TODO ajoute precedemment
+liste   # La liste devrait etre vide a nouveau
+\end{code}
+
+À l'intérieur de l'environnement de l'application (dans le conteneur), les
+commandes \texttt{liste}, \texttt{nouveau} et \texttt{retrait} permettent la
+gestion des TODOs pour un seul utilisateur. Puisque ce système sert de
+prototype, la commande \texttt{nouveau} génère une description aléatoire à
+l'aide de l'utilitarie \texttt{fortune}. Dans un système réel, cette commande
+devrait être remplacée par une commande permettant d'ajouter un TODO avec une
+description spécifiée par l'utilisateur et l'auteur du TODO devrait être
+déterminé au préalable (possiblement dans un fichier de configuration).
+
+\subsection{Arrêt 2: Fichier de configuration fonctionnel}
+\input{arret02.tex}
+
+\newpage
+\subsection{Arrêt 3: Fichier \textit{yml} utilisé pour \textit{docker-compose}}
+\input{arret03.tex}
+
+\subsection{Arrêt 4: Explication des problèmes inhérents}
+
+\subsection{Arrêt 5: Fichier \textit{yml} utilisé pour \textit{docker-compose}}
+
+\subsection{Arrêt 6: Fichier \textit{yml} utilisé pour \textit{kubernetes}}
+
 \section{Discussion de la structure}
 
 \todo{Quelle est la structure du système distribué de façon générique?} \\
