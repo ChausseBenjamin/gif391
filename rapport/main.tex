@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{codeblocks}
-\usepackage{xcolor}
+%\usepackage{xcolor}
 
 % \addbibresource{bibliography.bib}
 % \nofiles
@@ -86,28 +86,63 @@ déterminé au préalable (possiblement dans un fichier de configuration).
 
 \section{Discussion de la structure}
 
-\todo{Quelle est la structure du système distribué de façon générique?} \\
+La version finale du système offre une plus grande flexibilité par rapport aux premières itérations. Son principal inconvénient réside dans sa complexité croissante, ce qui peut entraîner des problèmes à différents niveaux, parfois difficiles à détecter. Cependant, les avantages sont nombreux. La nature distribuée du système facilite son expansion horizontale, le rendant ainsi adapté à un grand nombre d'utilisateurs. L'utilisation d'une base de données garantit l'atomicité des transactions pour éviter les conflits et les enregistrements en double. La réplication des serveurs et des bases de données augmente la redondance et, par conséquent, la résilience du système. La modularité des composants permet des mises à niveau fluides et transparentes pour l'utilisateur.
 
 \subsection{Technologies sous-jacentes}
 
 \subsubsection{Identification des ressources}
 
+La technologie utilisée pour identifier les ressources s'appelle "namespace". Elle nous a permis d'attribuer différentes ressources. Au début, nous l'avons principalement utilisée pour assigner des emplacements de stockage afin de partager des fichiers entre les différents conteneurs. Par la suite, lorsque des requêtes réseau via SSH ont été introduites, nous avons utilisé les namespaces pour créer un réseau virtuel sur lequel les machines pouvaient communiquer facilement. Les noms des conteneurs étaient utilisés pour remplacer les adresses IP, ce qui simplifiait grandement nos interactions. En résumé, les namespaces sont utiles pour assigner diverses ressources telles que le réseau, les systèmes de fichiers, les processus, les groupes ou les utilisateurs, et bien d'autres encore.
+
 \subsubsection{Contrôle d'accès aux ressources}
 
+Pour contrôler l'accès aux ressources, nous avons utilisé les cgroups. Ces derniers permettent d'attribuer l'allocation de différentes ressources (processeur, mémoire, disque) en fonction des membres du cgroup. Ces membres peuvent être un processus spécifique, un utilisateur ou un conteneur dans son intégralité. Nous pouvons gérer la quantité minimale de ressources et donner la priorité à certaines entités par rapport à d'autres. Les cgroups sont également un bon moyen de gérer les accès à des répertoires et à des réseaux spécifiques.
+
 \subsubsection{Gestion des accès aux fichiers utilisés}
+
+
+Docker utilise une technologie Linux très pratique appelée "système de fichiers en couches" (Union File System). Le concept est simple : certains répertoires sont en lecture seule, et lorsqu'une modification est nécessaire, elle est enregistrée dans un répertoire qui stocke uniquement les différences (un peu comme la technologie Git). Cette approche permet à plusieurs conteneurs d'utiliser la même base commune, mais chacun d'entre eux de manière distincte avec son propre répertoire de modifications. Dans la dernière itération, plusieurs clients utilisaient l'image client, mais chacun était unique. Cela nous permet d'utiliser efficacement l'espace de stockage et d'éviter de corrompre l'image initiale.
+
 
 \todo{Quels sont les pilotes utilisables pour la persistance du système de fichiers
 à union ?} \\
 \todo{Quel pilote de persistence a été utilisé et pourquoi ?}
 
+Plusieurs pilotes sont disponibles pour gérer les fichiers à union, tels que UFS (Advanced Multi-Layered Unification File System), DeviceMapper, Btrfs (B-Tree File System), mais celui qui nous intéresse est OverlayFS, plus spécifiquement sa deuxième version, Overlay2. Depuis la version 1.13 de Docker, Overlay2 est le pilote par défaut utilisé.
+
+Overlay2 est une version améliorée d'OverlayFS qui nous permet de gérer efficacement les modifications tout en maintenant la transparence des fichiers uniques pour l'utilisateur. Il garantit également l'intégrité des fichiers sous-jacents et réduit l'utilisation de l'espace mémoire nécessaire. Avec Overlay2, les modifications apportées aux fichiers dans les conteneurs sont enregistrées de manière efficace en créant des couches supplémentaires, tout en préservant l'état d'origine de l'image de base. Cela permet une utilisation efficace des ressources et facilite la création de conteneurs basés sur des images existantes.
+
 \subsubsection{Configuration réseau pour la communication des conteneurs}
 
+Pour simplifier l'environnement dans lequel nous travaillions, nous avons utilisé un namespace de réseau pour regrouper toutes les entités sur la même couche. Bien que cela fonctionnait, cette architecture n'était pas la plus idéale dans un environnement de production. Certaines entités, comme les clients, ne devraient pas nécessairement avoir accès aux autres, telles que la base de données. En général, ceux-ci sont disposées sur des réseaux distants et les interactions requises sont déterminées à l'avance. Afin d'assurer l'encapsulation des composants et la sécurité du système, l'authentification et le chiffrement sont des étapes obligatoires avant toute action. Étant donné que l'objectif de l'activité ne portait pas spécifiquement sur la mise en réseau, tous les services étaient visibles et accessibles à tous.
+
 \subsubsection{Duplication mise en place pour les ressources}
+Il y a quatre types principaux de ressources dans notre système : matériel, logiciel, données et réseau. La duplication de ces ressources s'applique différemment en fonction du contexte.
+En ce qui concerne le matériel, nous avons développé nos solutions dans un environnement de test principalement sur nos ordinateurs portables et systèmes personnels. Toutes les composantes utilisaient des ressources virtuellement dupliquées, mais fondamentalement, nous utilisions le même processeur et la même mémoire vive pour faire fonctionner l'ensemble du système.
+Pour le logiciel, toutes les images reposaient sur les mêmes fondations Docker et contenaient une copie du script "todo.py". Cela signifiait que toute modification nécessitait la mise à jour de tous les fichiers et la relance complète du déploiement.
+En ce qui concerne les données, nous sommes passés d'un simple fichier texte à une base de données entièrement autonome. Dans le cas où plusieurs bases de données seraient utilisées, la réplication des données entre les bases de données deviendrait un aspect important à prendre en compte.
+En ce qui concerne le réseau, étant donné que nous étions tous sur la même machine, aucune duplication n'était nécessaire.
+Il est important de noter que la duplication des ressources peut varier en fonction des exigences spécifiques du système pour lequel il est conçu, de la redondance souhaitée et des contraintes de performance. Les stratégies de duplication sont mises en place pour assurer la disponibilité et la résilience des opérations du système.
+
+
 
 \todo{Quelles ressources doivent être dupliquées, et pourquoi?} \\
+Dans un système de production, la duplication des données est essentielle pour garantir leur intégrité et leur confidentialité. On met généralement en place des répliques de bases de données et des copies de sauvegarde qui sont envoyées en dehors de leur site physique respectif. Cette duplication des données améliore également la résilience et les performances du système. En répartissant les sites géographiquement, on réduit la distance entre l'utilisateur et le système, et en cas de panne, le trafic peut être redirigé vers d'autres sites fonctionnels.
+
+
+De manière générale, les systèmes distribués sont situés dans des clusters où la duplication est déjà prise en charge. Les machines physiques ne sont que des unités de puissance de calcul, et la défaillance de l'une d'entre elles n'entraîne pas de perte de performance notable. La redondance du réseau est également assurée dans ces centres, car ils disposent d'une infrastructure robuste face aux pannes. De nos jours, les systèmes de cloud se chargent en grande partie de la réplication physique pour la performance et de la redondance réseau pour assurer l'accessibilité. 
+
 \todo{Dans quel cas la duplication peut se faire sur une machine réelle unique, dans
 quel cas elle doit être distribuée sur plusieurs machines réelles ?}
 
+Dans un environnement de développement ou de test, il est courant de dupliquer les données uniquement sur notre machine pour faciliter les opérations. En revanche, dans un système de production, la duplication des données devrait se faire sur plusieurs sites pour plusieurs raisons. Tout d'abord, la disponibilité : en cas de panne d'une machine, une autre machine dans un autre site peut prendre en charge rapidement les demandes. Ensuite, la performance : avec des sites géographiquement dispersés, les données sont réparties et les requêtes sont acheminées vers le serveur le plus proche, réduisant ainsi le temps de réponse.
+
+\section{Conclusion}
+Pour conclure, les systèmes distribués font partie intégrante de notre quotidien, car ils sont présents dans toutes les applications et services que nous utilisons. Leur objectif principal est d'assurer l'intégrité, la confidentialité et la disponibilité des données. Ils parviennent à atteindre cet objectif grâce à la duplication des ressources aux quatre niveaux mentionnés : matériel, logiciel, données et réseau.
+
+La redondance au niveau matériel et réseau garantit l'accessibilité du système, en permettant la reprise rapide en cas de défaillance d'une machine ou d'un réseau. La duplication des composants logiciels et des données contribue à améliorer les performances et la disponibilité en répartissant les charges de travail et en permettant une récupération rapide en cas de panne.
+
+Les systèmes distribués et leur duplication des ressources jouent un rôle crucial dans notre monde connecté. Ils nous permettent de bénéficier d'applications et de services fiables et disponibles en permanence, améliorant ainsi notre expérience numérique du quotidien.
 
 % \newpage
 % \printbibliography[heading=bibintoc]
