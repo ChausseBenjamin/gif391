@@ -11,6 +11,9 @@
 *.aux
 *.log
 *.bbl
+*.toc
+*.listing
+*.bcf
 *.blg
 *.run.xml
 *.synctex
